@@ -56,22 +56,21 @@ class Escalonador:
                 print("No ready process to run.")
                 return
 
-
-        if process.recurso_necessario == "Disc" and not process.ja_bloqueado:
-            process.ja_bloqueado = True
+        if process.necessary_resource == "DISC" and not process.blocked:
+            process.blocked = True
             self.blocked_list.insert_end(process)
             print(f"[Block] {process.nome} needs DISC and was blocked.")
             return
 
 
         print(f"[Run] Running: {process}")
-        process.ciclos_necessarios -= 1
+        process.necessary_cycles -= 1
 
-        if process.ciclos_necessarios <= 0:
-            print(f"[Finish] {process.nome} finished!")
+        if process.necessary_cycles <= 0:
+            print(f"[Finish] {process.name} finished!")
         else:
             source.insert_end(process)
-            print(f"[Requeue] {process.nome} returned to queue")
+            print(f"[Requeue] {process.name} returned to queue")
 
     def display_state(self):
         print("\n[Queues]")

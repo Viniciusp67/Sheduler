@@ -85,12 +85,12 @@ def main():
     while True:
         print(f"\n--- Cycle {cycle} ---")
         scheduler.display_state()
-        scheduler.run_cpu_cycle()
+        scheduler.run_cpu_cycles()
 
-        if (scheduler.high_priority.is_empty() and
-            scheduler.medium_priority.is_empty() and
-            scheduler.low_priority.is_empty() and
-            scheduler.blocked.is_empty()):
+        if (scheduler.high_priority_list.empty() and
+            scheduler.medium_priority_list.empty() and
+            scheduler.low_priority_list.empty() and
+            scheduler.blocked_list.empty()):
             print("\n All processes finished.")
             break
 
