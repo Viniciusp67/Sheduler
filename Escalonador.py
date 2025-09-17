@@ -1,75 +1,81 @@
-    from Process_list import ProcessList
+from Process_list import ProcessList
 
 class Escalonador:
-
     def __init__(self):
         self.high_priority_list = ProcessList()
-        self.mediun_priority_list = ProcessList()
+        self.medium_priority_list = ProcessList()
         self.low_priority_list = ProcessList()
         self.blocked_list = ProcessList()
         self.high_worst_cycle_counter = 0
 
+    def insert_by_priority(self, process):
+        if process.priority == 1:
+            self.high_priority_list.insert_end(process)
+        elif process.priority == 2:
+            self.medium_priority_list.insert_end(process)
+        elif process.priority == 3:
+            self.low_priority_list.insert_end(process)
 
     def run_cpu_cycles(self):
         print("=== Início do Ciclo ===")
 
         if not self.blocked_list.empty():
-            processo = self.blocked_list.remove_start()
-            self.insert_by_priority(processo)
-            print(f"[DESBLOQUEIO] {processo.nome} retornou à fila P{processo.priority}")
+            process = self.blocked_list.remove_start()
+            self.insert_by_priority(process)
+            print(f"[Unblock] {process.nome} returned to P{process.priority} queue")
 
-        processo = None
-        origem = None
+        process = None
+        source = None
 
         if self.high_worst_cycle_counter >= 5:
-            if not self.mediun_priority_list.empty():
-                processo = self.mediun_priority_list.remove_start()
-                origem = self.mediun_priority_list
+            if not self.medium_priority_list.empty():
+                process = self.medium_priority_list.remove_start()
+                source = self.medium_priority_list
                 self.high_worst_cycle_counter = 0
-                print("[ANTI-INANIÇÃO] Executando processo de prioridade MÉDIA")
+                print("[Anti_Starvation] Running Medium priority process")
             elif not self.low_priority_list.empty():
-                processo = self.low_priority_list.remove_start()
-                origem = self.low_priority_list
+                process = self.low_priority_list.remove_start()
+                source = self.low_priority_list
                 self.high_worst_cycle_counter = 0
-                print("[ANTI-INANIÇÃO] Executando processo de prioridade BAIXA")
+                print("[Anti-Starvation] Running Low priority process")
 
-        if not processo:
+        if not process:
             if not self.high_priority_list.empty():
-                processo = self.high_priority_list.remove_start()
-                origem = self.high_priority_list
+                process = self.high_priority_list.remove_start()
+                source = self.high_priority_list
                 self.high_worst_cycle_counter += 1
-            elif not self.mediun_priority_list.empty():
-                processo = self.mediun_priority_list.remove_start()
-                origem = self.mediun_priority_list
+            elif not self.medium_priority_list.empty():
+                process = self.medium_priority_list.remove_start()
+                source = self.medium_priority_list
                 self.high_worst_cycle_counter = 0
             elif not self.low_priority_list.empty():
-                processo = self.low_priority_list.remove_start()
-                origem = self.low_priority_list
-                self.high_worst_cycle_counter = 0
+                process = self.low_priority_list.remove_start()
+                source = self.low_priority_list
+                self.high_worst_cycle_counter = 0   
             else:
-                print("Nenhum processo pronto para executar.")
-
+                print("No ready process to run.")
                 return
 
-        if processo.recurso_necessario == "DISCO" and not processo.ja_bloqueado:
-            processo.ja_bloqueado = True
-            self.blocked_list.insert_end(processo)
-            print(f"[BLOQUEIO] {processo.nome} precisa de DISCO e foi bloqueado.")
+
+        if process.recurso_necessario == "Disc" and not process.ja_bloqueado:
+            process.ja_bloqueado = True
+            self.blocked_list.insert_end(process)
+            print(f"[Block] {process.nome} needs DISC and was blocked.")
             return
 
 
-        print(f"[EXECUÇÃO] Executando: {processo}")
-        processo.ciclos_necessarios -= 1
+        print(f"[Run] Running: {process}")
+        process.ciclos_necessarios -= 1
 
-        if processo.ciclos_necessarios <= 0:
-            print(f"[TÉRMINO] {processo.nome} finalizou!")
+        if process.ciclos_necessarios <= 0:
+            print(f"[Finish] {process.nome} finished!")
         else:
-            origem.insert_end(processo)
-            print(f"[REINSERÇÃO] {processo.nome} retornou à fila")
+            source.insert_end(process)
+            print(f"[Requeue] {process.nome} returned to queue")
 
     def display_state(self):
-        print("\n[Listas]")
-        print("  Alta:", self.high_priority_list.display_names())
-        print("  Média:", self.mediun_priority_list.display_names())
-        print("  Baixa:", self.low_priority_list.display_names())
-        print("  Bloqueados:", self.blocked_list.display_names())
+        print("\n[Queues]")
+        print("  High:", self.high_priority_list.display_names())
+        print("  Medium:", self.medium_priority_list.display_names())
+        print("  Low:", self.low_priority_list.display_names())
+        print("  Blocked:", self.blocked_list.display_names())
