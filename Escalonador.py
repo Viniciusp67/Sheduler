@@ -1,4 +1,4 @@
-from Process_list import ProcessList
+    from Process_list import ProcessList
 
 class Escalonador:
 
@@ -48,4 +48,28 @@ class Escalonador:
                 self.high_worst_cycle_counter = 0
             else:
                 print("Nenhum processo pronto para executar.")
+
                 return
+
+        if processo.recurso_necessario == "DISCO" and not processo.ja_bloqueado:
+            processo.ja_bloqueado = True
+            self.blocked_list.insert_end(processo)
+            print(f"[BLOQUEIO] {processo.nome} precisa de DISCO e foi bloqueado.")
+            return
+
+
+        print(f"[EXECUÇÃO] Executando: {processo}")
+        processo.ciclos_necessarios -= 1
+
+        if processo.ciclos_necessarios <= 0:
+            print(f"[TÉRMINO] {processo.nome} finalizou!")
+        else:
+            origem.insert_end(processo)
+            print(f"[REINSERÇÃO] {processo.nome} retornou à fila")
+
+    def display_state(self):
+        print("\n[Listas]")
+        print("  Alta:", self.high_priority_list.display_names())
+        print("  Média:", self.mediun_priority_list.display_names())
+        print("  Baixa:", self.low_priority_list.display_names())
+        print("  Bloqueados:", self.blocked_list.display_names())
